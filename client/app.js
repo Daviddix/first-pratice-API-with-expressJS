@@ -57,7 +57,7 @@ form.addEventListener("submit",async (e)=>{
 
 async function sendDataToDb(data){
     try{
-         const sendingAnime = await fetch("http://localhost:3000/anime",{
+         const sendingAnime = await fetch("https://anime-api-yyag.onrender.com/anime",{
             method : "POST",
             body : JSON.stringify(data),
             headers : {
@@ -75,7 +75,7 @@ async function sendDataToDb(data){
 
 async function getAllAnimeFromDb(){
     try{
-        const req = await fetch("http://localhost:3000/anime")
+        const req = await fetch("https://anime-api-yyag.onrender.com/anime")
         const data = await req.json()
         let animes = ""
         data.forEach((animeFromDb)=>{
@@ -105,7 +105,7 @@ async function getAllAnimeFromDb(){
 
 async function deleteAnimeFromDb(nameOfAnimeToDelete){
     try{
-        const deletedAnime = await fetch(`http://localhost:3000/anime/${nameOfAnimeToDelete}`,{
+        const deletedAnime = await fetch(`https://anime-api-yyag.onrender.com/anime/${nameOfAnimeToDelete}`,{
             method : "DELETE",
             headers : {
                 "Content-Type" : "application/json"
@@ -132,7 +132,7 @@ function populateUpdateInputs(dataObj){
 
 async function getSingleAnime(singleAnimeName){
     try{
-        const res = await fetch(`http://localhost:3000/anime/${singleAnimeName}`)
+        const res = await fetch(`https://anime-api-yyag.onrender.com/anime/${singleAnimeName}`)
         const data = await res.json()
         return data
     }
@@ -144,7 +144,7 @@ async function getSingleAnime(singleAnimeName){
 
 async function updateAnime(nameOfAnimeToUpdate, data){
     try{
-        const updateRes = await fetch(`http://localhost:3000/anime/${nameOfAnimeToUpdate}`,{
+        const updateRes = await fetch(`https://anime-api-yyag.onrender.com/${nameOfAnimeToUpdate}`,{
             method : "PATCH",
             headers : {
                 "Content-Type" : "application/json"
