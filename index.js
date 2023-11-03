@@ -1,20 +1,28 @@
 const express = require("express")
 const app = express()
+require("dotenv").config()
+const cors = require('cors')
+const mongoose = require("mongoose")
 let animeData = require("./animeData")
+const animeModel = require("./models/Anime")
 const port = process.env.PORT || 3000
+const MONGO_URI = process.env.MONGO_URI
 
 app.use(express.json())
+app.use(cors())
+ 
 
-app.get("/anime", (req, res)=>{
-    res.send(animeData)  
+app.get("/anime", async (req, res)=>{
+    const animesFromDB = await animeModel.find()
+    res.send(animesFromDB)
 })
 
-app.get("/anime/:animeId", (req, res)=>{
-    const id = req.params.animeId 
+app.get("/anime/:animeName", async (req, res)=>{
+    const animeName = req.params.animeName 
 
-    const particularAnime = animeData.filter((anime) => anime.id == id)
+    const particularAnime = await animeModel.findOne({animeName})
     
-    if (particularAnime.length > 0){
+    if (particularAnime.length !== null){
         return res.send(particularAnime)
     }
     
@@ -22,37 +30,39 @@ app.get("/anime/:animeId", (req, res)=>{
 
 })
 
-app.delete("/anime/:animeId", (req, res)=>{
-    const id = parseInt(req.params.animeId)
+app.delete("/anime/:animeName", async (req, res)=>{
+    const animeName = req.params.animeName 
 
-    animeData = animeData.filter((anime) => anime.id !== id)
+    const deletedAnime = await animeModel.findOneAndDelete({animeName})
 
-    res.send(animeData)
+    res.send(`deleted ${deletedAnime.animeName} from the database`)
 })
 
-app.post("/anime", (req, res)=>{
-    const newAnime = req.body
-    console.log(newAnime)
-
-    if(Object.keys(newAnime).length === 0) return res.status(405).send({status : "Empty value found", message : "Body cannot be empty"})
-
-    animeData = [...animeData, newAnime]
-    res.send("Anime Added to DB")
-})
-
-app.patch("/anime/:animeId", (req, res)=>{
-    const id = req.params.animeId 
-
-    const thingsToUpdate = req.body
-
-    let particularAnimeIndex = animeData.findIndex((anime)=> anime.id == id)
-    if (particularAnimeIndex == -1) {
-        return res.status(404).send({status : "failed", message : `anime with the id of ${id} not found`})
+app.post("/anime", async (req, res)=>{
+    if(req.body){
+        const animeToAdd = await animeModel.create(req.body)
+        return res.send("anime added")
     }
-    animeData[particularAnimeIndex] = {...animeData[particularAnimeIndex], ...thingsToUpdate}
-    res.send({status : "Successful", data : animeData[particularAnimeIndex]})
+    return res.status(400).send("an error ocurred") 
+})
+ 
+app.patch("/anime/:animeName", async (req, res)=>{
+    const name = req.params.animeName 
+    const thingsToUpdate = req.body
+    console.log(thingsToUpdate)
+
+    let animeToUpdate = await animeModel.findOneAndUpdate({animeName : name}, thingsToUpdate, {new : true})
+
+    res.send(animeToUpdate)
 })
 
-app.listen(port, () => {
+
+mongoose.connect(MONGO_URI)
+.then(()=>{
+    app.listen(port, () => {
     console.log('App listening on port 3000!');
-});
+})
+})
+.catch((err)=>{
+    console.log("an error occured", err)
+})

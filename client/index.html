@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Anime Backend frontend</title>
+    <link rel="stylesheet" href="./styles.css">
+</head>
+<body>
+    <h1>Input details for anime</h1>
+
+    <form class="form">
+        <div class="name">
+            <label for="anime-name">Anime Name</label>
+            <br>
+            <input required type="text" id="anime-name">
+        </div>
+
+        <div class="episodes">
+            <label for="anime-episodes">Number of episodes</label>
+            <br>
+            <input required type="number" id="anime-episodes">
+        </div>
+
+        <div class="mc">
+            <label for="anime-mc">Main Character</label>
+            <br>
+            <input required type="text" id="anime-mc">
+        </div>
+
+        <div class="villan">
+            <label for="anime-villan">Anime Antagonist</label>
+            <br>
+            <input required type="text" id="anime-villan">
+        </div>
+
+        <div class="sites">
+            <label for="sites-to-watch">Sites to watch</label>
+            <br>
+            <textarea required type="text" id="sites-to-watch"></textarea>
+        </div>
+
+        <div class="seasons">
+            <label for="anime-seasons">No of Seasons</label>
+            <br>
+            <input required type="number" id="anime-seasons">
+        </div>
+
+        
+
+        <div class="status">
+            <label for="anime-status">Anime Status</label>
+            <br>
+            <input required type="text" id="anime-status">
+        </div>
+
+        <button>Add to db</button>
+    </form>
+
+    <h1>Animes in Database</h1>
+    <div class="animes-container">
+   <p>Fetching Animes from Database...</p>
+    </div>
+    
+    <div class="update-overlay hidden">
+        <form class="update-form">
+            <div class="name">
+                <label for="update-anime-name">Anime Name</label>
+                <br>
+                <input required type="text" id="update-anime-name">
+            </div>
+    
+            <div class="episodes">
+                <label for="update-anime-episodes">Number of episodes</label>
+                <br>
+                <input required type="number" id="update-anime-episodes">
+            </div>
+    
+            <div class="mc">
+                <label for="update-anime-mc">Main Character</label>
+                <br>
+                <input required type="text" id="update-anime-mc">
+            </div>
+    
+            <div class="villan">
+                <label for="update-anime-villan">Anime Antagonist</label>
+                <br>
+                <input required type="text" id="update-anime-villan">
+            </div>
+    
+            <div class="sites">
+                <label for="update-sites-to-watch">Sites to watch</label>
+                <br>
+                <textarea required type="text" id="update-sites-to-watch"></textarea>
+            </div>
+    
+            <div class="seasons">
+                <label for="update-anime-seasons">No of Seasons</label>
+                <br>
+                <input required type="number" id="update-anime-seasons">
+            </div>
+    
+            
+    
+            <div class="status">
+                <label for="update-anime-status">Anime Status</label>
+                <br>
+                <input required type="text" id="update-anime-status">
+            </div>
+    
+            <button>Update Anime</button>
+        </form>
+    </div>
+
+    
+</body>
+
+<script src="./app.js"></script>
+</html>
