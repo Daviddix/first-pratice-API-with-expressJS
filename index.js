@@ -64,5 +64,5 @@ mongoose.connect(MONGO_URI)
 })
 })
 .catch((err)=>{
-    console.log("an error occured", err)
+    console.log("an error ocurred", err)
 })
