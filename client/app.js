@@ -145,7 +145,7 @@ async function getSingleAnime(singleAnimeName){
 
 async function updateAnime(idOfAnimeToUpdate, data){
     try{
-        const updateRes = await fetch(`http://localhost:3000/anime/${idOfAnimeToUpdate}`,{ 
+        const updateRes = await fetch(`https://anime-api-yyag.onrender.com/anime/${idOfAnimeToUpdate}`,{ 
             method : "PATCH",
             headers : {
                 "Content-Type" : "application/json"
