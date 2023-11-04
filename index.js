@@ -3,7 +3,6 @@ const app = express()
 require("dotenv").config()
 const cors = require('cors')
 const mongoose = require("mongoose")
-let animeData = require("./animeData")
 const animeModel = require("./models/Anime")
 const port = process.env.PORT || 3000
 const MONGO_URI = process.env.MONGO_URI
@@ -46,14 +45,13 @@ app.post("/anime", async (req, res)=>{
     return res.status(400).send("an error ocurred") 
 })
  
-app.patch("/anime/:animeName", async (req, res)=>{
-    const name = req.params.animeName 
+app.patch("/anime/:animeId", async (req, res)=>{
+    const id = req.params.animeId
     const thingsToUpdate = req.body
-    console.log(thingsToUpdate)
 
-    let animeToUpdate = await animeModel.findOneAndUpdate({animeName : name}, thingsToUpdate, {new : true})
+    let animeToUpdate = await animeModel.findByIdAndUpdate(id, thingsToUpdate, {returnDocument : 'after'})
 
-    res.send(animeToUpdate)
+    res.send(animeToUpdate) 
 })
 
 

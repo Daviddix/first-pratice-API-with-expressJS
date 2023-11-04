@@ -79,7 +79,7 @@ async function getAllAnimeFromDb(){
         const data = await req.json()
         let animes = ""
         data.forEach((animeFromDb)=>{
-            animes +=` <div class="anime"> 
+            animes +=` <div data-id=${animeFromDb._id} class="anime"> 
             <span>Name:</span> <span class="name">${animeFromDb.animeName}</span>
             <p>Number of episodes:${animeFromDb.noOfEpisodes}</p>
             <p>Main Character:${animeFromDb.mainCharacter}</p>
@@ -128,6 +128,7 @@ function populateUpdateInputs(dataObj){
     updateAnimeSites.value = dataObj.siteToWatch.join(",")
     updateNoOfSeasons.value = dataObj.seasons
     updateAnimeStatus.value = dataObj.status
+    updateForm.dataset.id = dataObj._id
 }
 
 async function getSingleAnime(singleAnimeName){
@@ -142,9 +143,9 @@ async function getSingleAnime(singleAnimeName){
     }
 }
 
-async function updateAnime(nameOfAnimeToUpdate, data){
+async function updateAnime(idOfAnimeToUpdate, data){
     try{
-        const updateRes = await fetch(`https://anime-api-yyag.onrender.com/${nameOfAnimeToUpdate}`,{
+        const updateRes = await fetch(`http://localhost:3000/anime/${idOfAnimeToUpdate}`,{ 
             method : "PATCH",
             headers : {
                 "Content-Type" : "application/json"
@@ -179,7 +180,7 @@ animeDbContainer.addEventListener("click", async (e)=>{
 
 updateForm.addEventListener("submit", async(e)=>{
     e.preventDefault()
-    const animeData = {
+    const animeData = {        
         animeName : updateAnimeName.value,
         noOfEpisodes : Number(updateNoOfEpisodes.value),
         mainCharacter : updateMainCharacter.value,
@@ -189,7 +190,7 @@ updateForm.addEventListener("submit", async(e)=>{
         status: updateAnimeStatus.value,
       }
 
-    await updateAnime(updateAnimeName.value, animeData)
+    await updateAnime(updateForm.dataset.id, animeData)
     getAllAnimeFromDb()
 
 })
