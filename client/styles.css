@@ -131,3 +131,21 @@ button{
     max-height: 70vh;
     overflow-y: scroll;
 }
+
+.logged-in button{
+    max-width: fit-content;
+}
+
+.logged-in.hidden{
+    display:none;
+}
+
+.logged-in{
+    display:flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.a.hidden{
+    display : none;
+}

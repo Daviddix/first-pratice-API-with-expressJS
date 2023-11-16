@@ -4,16 +4,42 @@ require("dotenv").config()
 const cors = require('cors')
 const mongoose = require("mongoose")
 const animeModel = require("./models/Anime")
+const userRouter = require("./routes/UserRoute.js")
+const cookieParser = require("cookie-parser")
 const port = process.env.PORT || 3000
 const MONGO_URI = process.env.MONGO_URI
+const jwt = require("jsonwebtoken")
 
 app.use(express.json())
-app.use(cors())
+app.use(cookieParser())
+app.use(cors(
+    {
+        credentials : true,
+        origin : "http://127.0.0.1:5500"
+    }
+))
+app.use("/user", userRouter)
  
+async function useAuth(req, res,next){
+    const token = req.cookies.jwt
 
-app.get("/anime", async (req, res)=>{
-    const animesFromDB = await animeModel.find()
-    res.send(animesFromDB)
+    if(!token){
+        console.log("no token")
+        return res.status(401).json({ error: 'Unauthorized - Missing JWT in cookies',type: "auth error" })
+    }
+
+      jwt.verify(token, "daviddixx", async function(err, decoded){
+                if(err){
+                    console.log("token error")
+                    return res.status(401).json({ error: 'Unauthorized - Invalid JWT', type: "auth error"});
+                }
+                    next()
+    })
+}
+
+app.get("/anime",  async (req, res)=>{
+    const animesFromDB = await animeModel.find() 
+    res.send(animesFromDB) 
 })
 
 app.get("/anime/:animeName", async (req, res)=>{
@@ -29,12 +55,18 @@ app.get("/anime/:animeName", async (req, res)=>{
 
 })
 
-app.delete("/anime/:animeName", async (req, res)=>{
+app.delete("/anime/:animeName", useAuth, async (req, res)=>{
+    try{
     const animeName = req.params.animeName 
 
-    const deletedAnime = await animeModel.findOneAndDelete({animeName})
+        const deletedAnime = await animeModel.findOneAndDelete({animeName})
 
-    res.send(`deleted ${deletedAnime.animeName} from the database`)
+        res.status(200).json({status : "success" , message : `deleted ${deletedAnime.animeName} from the database`})
+    }
+    catch (err){
+        res.status(400).json({error : "an error ocurred on the server", type : "server error"})
+    }
+    
 })
 
 app.post("/anime", async (req, res)=>{
@@ -45,14 +77,22 @@ app.post("/anime", async (req, res)=>{
     return res.status(400).send("an error ocurred") 
 })
  
-app.patch("/anime/:animeId", async (req, res)=>{
-    const id = req.params.animeId
-    const thingsToUpdate = req.body
+app.patch("/anime/:animeId", useAuth, async (req, res)=>{
+    try{
+            const id = req.params.animeId
+            const thingsToUpdate = req.body
+            if(!thingsToUpdate){
+                throw Error("body cannot be empty")
+            }
+            let animeToUpdate = await animeModel.findByIdAndUpdate(id, thingsToUpdate, {returnDocument : 'after'})
 
-    let animeToUpdate = await animeModel.findByIdAndUpdate(id, thingsToUpdate, {returnDocument : 'after'})
-
-    res.send(animeToUpdate) 
-})
+            res.send(animeToUpdate)  
+    }
+    catch(err){
+        res.status(400).json({status : "failed", type : "server error", moreInfo : err})
+    }
+      
+}) 
 
 
 mongoose.connect(MONGO_URI)

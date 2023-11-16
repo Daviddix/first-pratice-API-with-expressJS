@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="./styles.css">
+    <title>Document</title>
+</head>
+<body>
+    <h1>Signup</h1>
+
+    <form class="form">
+        <div class="username">
+            <label for="username">Username</label>
+            <br>
+            <input required type="text" id="username">
+        </div>
+
+        <div class="email">
+            <label for="email">Email Address</label>
+            <br>
+            <input required type="email" id="email">
+        </div>
+
+        <div class="password">
+            <label for="password">Password</label>
+            <br>
+            <input required type="password" id="password">
+        </div>
+
+        <button>Signup</button>
+    </form>
+</body>
+
+<script>
+    const signUpForm = document.querySelector("form")
+
+    signUpForm.addEventListener("submit", (e)=>{
+        e.preventDefault()
+        const username = signUpForm.username.value
+        const email = signUpForm.email.value
+        const password = signUpForm.password.value
+        createNewUser(email, username, password)
+    })
+
+    async function createNewUser(email, username, password) {
+            const payload = JSON.stringify({
+                email, username, password
+            })
+
+            try {
+                const req = await fetch("http://localhost:3000/user/signup", {
+                    method: "POST",
+                    body: payload,
+                    headers : {
+                        "Content-Type" : "application/json"
+                    },
+                    credentials : "include"
+                })
+                if(req.ok){
+                    const data = await req.json()
+                console.log(data)
+                window.location.assign("/client/index.html")
+                }else{
+                    throw Error("Couldn't sign user up")
+                }
+                
+            } catch (err) {
+                console.log(err)
+                alert("something went wrong")
+            }
+
+
+        }
+</script>
+</html>

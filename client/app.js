@@ -36,9 +36,16 @@ const animeDbContainer = document.querySelector(".animes-container")
 
 const updateModal = document.querySelector(".update-overlay")
 
+const loggedInContainer = document.querySelector(".logged-in")
 
+const loggedInText = document.querySelector(".logged-in h1")
+
+const links = document.querySelector(".a")
+
+const logoutButton = document.querySelector(".logout-btn")
 
 getAllAnimeFromDb()
+getUserDetails()
 
 form.addEventListener("submit",async (e)=>{
     e.preventDefault()
@@ -57,7 +64,7 @@ form.addEventListener("submit",async (e)=>{
 
 async function sendDataToDb(data){
     try{
-         const sendingAnime = await fetch("https://anime-api-yyag.onrender.com/anime",{
+         const sendingAnime = await fetch("http://localhost:3000/anime",{
             method : "POST",
             body : JSON.stringify(data),
             headers : {
@@ -75,7 +82,12 @@ async function sendDataToDb(data){
 
 async function getAllAnimeFromDb(){
     try{
-        const req = await fetch("https://anime-api-yyag.onrender.com/anime")
+        const req = await fetch("http://localhost:3000/anime",{
+            credentials : "include"
+        })
+        if(!req.ok){
+            throw Error("something broke")
+        }
         const data = await req.json()
         let animes = ""
         data.forEach((animeFromDb)=>{
@@ -105,18 +117,29 @@ async function getAllAnimeFromDb(){
 
 async function deleteAnimeFromDb(nameOfAnimeToDelete){
     try{
-        const deletedAnime = await fetch(`https://anime-api-yyag.onrender.com/anime/${nameOfAnimeToDelete}`,{
+        const response = await fetch(`http://localhost:3000/anime/${nameOfAnimeToDelete}`,{
             method : "DELETE",
             headers : {
                 "Content-Type" : "application/json"
-            }
+            },
+            credentials : "include"
         })
-        alert(`${nameOfAnimeToDelete} has been deleted`)
-        return deletedAnime
+        if(!response.ok){
+            const errorResponse = await response.json()
+            throw new Error("", {cause : errorResponse})
+        }
+        const deletedAnime = await response.json()
+        console.log(`${nameOfAnimeToDelete} has been deleted`, deletedAnime)
+
    }
    catch (err){
-       console.log(err)
-       alert("An error ocurred")
+    if(err.cause.type == "auth error"){
+    alert("please signup to update")
+    window.location.assign("/client/signup.html")
+    }else{
+        alert("an error ocurred")
+    }
+    console.log(err)
    }
 }
 
@@ -145,19 +168,29 @@ async function getSingleAnime(singleAnimeName){
 
 async function updateAnime(idOfAnimeToUpdate, data){
     try{
-        const updateRes = await fetch(`https://anime-api-yyag.onrender.com/anime/${idOfAnimeToUpdate}`,{ 
+        const updateRes = await fetch(`http://localhost:3000/anime/${idOfAnimeToUpdate}`,{ 
             method : "PATCH",
             headers : {
                 "Content-Type" : "application/json"
             },
+            credentials: "include",
             body :JSON.stringify(data) 
         })
+
+        if(!updateRes.ok){
+            const updateResInJson = await updateRes.json()
+            throw Error("broke",{cause :updateResInJson})
+        }
         updateModal.classList.add("hidden")
-        return updateRes
+        alert("anime updated")
     }
     catch(err){
-        console.log(err)
-        alert("couldn't update")
+        if(err.cause.type == "auth error"){
+            alert("please signup to update")
+        window.location.assign("/client/signup.html")
+        }else{
+            alert("seems like an error ocurred")
+        }
     }
 }
 
@@ -194,3 +227,42 @@ updateForm.addEventListener("submit", async(e)=>{
     getAllAnimeFromDb()
 
 })
+
+async function getUserDetails(){
+    try{
+        const userResponse = await fetch("http://localhost:3000/user/profile", {
+                credentials : "include"
+        })
+        const userResponseInJson = await userResponse.json()
+        if(!userResponse.ok){
+            throw Error("not found", {cause :updateResInJson})
+        }
+        
+        links.classList.add("hidden")
+        const username = userResponseInJson.username.username
+        loggedInContainer.classList.remove("hidden")
+        loggedInText.innerHTML = `Welcome back ${username}`
+    }
+    catch (err){
+        loggedInContainer.classList.add("hidden")
+        links.classList.remove("hidden")
+    }    
+}
+
+async function logUserOut(){
+    try{
+        const userResponse = await fetch("http://localhost:3000/user/logout", {
+                credentials : "include"
+        })
+        const c = await userResponse.json()
+        console.log(c)
+        if(!userResponse.ok) throw Error("server error")
+        loggedInContainer.classList.add("hidden")
+        links.classList.remove("hidden")
+    }
+    catch(err){
+        alert("seems like an error ocurred when trying to log you out")
+    }
+}
+
+logoutButton.addEventListener("click", logUserOut)
